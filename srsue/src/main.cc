@@ -152,6 +152,8 @@ static int parse_args(all_args_t* args, int argc, char* argv[])
     ("log.usim_hex_limit", bpo::value<int>(&args->stack.log.usim_hex_limit), "USIM log hex dump limit")
     ("log.stack_level", bpo::value<string>(&args->stack.log.stack_level), "Stack log level")
     ("log.stack_hex_limit", bpo::value<int>(&args->stack.log.stack_hex_limit), "Stack log hex dump limit")
+    ("log.extif_level", bpo::value<string>(&args->stack.log.extif_level), "External interface log level")
+    ("log.extif_hex_limit", bpo::value<int>(&args->stack.log.extif_hex_limit), "External interface log hex dump limit")
 
     ("log.all_level", bpo::value<string>(&args->log.all_level)->default_value("info"), "ALL log level")
     ("log.all_hex_limit", bpo::value<int>(&args->log.all_hex_limit)->default_value(32), "ALL log hex dump limit")
@@ -513,6 +515,9 @@ static int parse_args(all_args_t* args, int argc, char* argv[])
     if (!vm.count("log.stack_level")) {
       args->stack.log.stack_level = args->log.all_level;
     }
+    if (!vm.count("log.extif_level")) {
+      args->stack.log.extif_level = args->log.all_level;
+    }
   }
 
   // Apply all_hex_limit to any unset layers
@@ -543,6 +548,9 @@ static int parse_args(all_args_t* args, int argc, char* argv[])
     }
     if (!vm.count("log.stack_hex_limit")) {
       args->stack.log.stack_hex_limit = args->log.all_hex_limit;
+    }
+    if (!vm.count("log.extif_hex_limit")) {
+      args->stack.log.extif_hex_limit = args->log.all_hex_limit;
     }
   }
 

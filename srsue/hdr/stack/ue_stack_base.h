@@ -48,6 +48,7 @@ typedef struct {
   std::string nas_level;
   std::string usim_level;
   std::string stack_level;
+  std::string extif_level;
 
   int mac_hex_limit;
   int rlc_hex_limit;
@@ -57,6 +58,7 @@ typedef struct {
   int nas_hex_limit;
   int usim_hex_limit;
   int stack_hex_limit;
+  int extif_hex_limit;
 } stack_log_args_t;
 
 typedef struct {

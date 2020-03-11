@@ -105,6 +105,8 @@ int ue_stack_lte::init(const stack_args_t& args_, srslte::logger* logger_)
   usim_log->set_hex_limit(args.log.usim_hex_limit);
   nas_log->set_level(args.log.nas_level);
   nas_log->set_hex_limit(args.log.nas_hex_limit);
+  extif_log->set_level(args.log.extif_level);
+  extif_log->set_hex_limit(args.log.extif_hex_limit);
 
   // Should we use the built-in NAS implementation
   // TODO: or provide an external interface (RRCTL)?

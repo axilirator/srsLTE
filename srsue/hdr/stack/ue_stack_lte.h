@@ -159,6 +159,7 @@ private:
   srslte::log_ref usim_log{"USIM"};
   srslte::log_ref nas_log{"NAS"};
   srslte::log_ref pool_log{"POOL"};
+  srslte::log_ref extif_log{"EXTIF"};
 
   // RAT-specific interfaces
   phy_interface_stack_lte* phy = nullptr;
