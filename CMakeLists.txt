@@ -226,6 +226,7 @@ endif(BUILD_STATIC)
 
 set(BOOST_REQUIRED_COMPONENTS
   program_options
+  system
 )
 if(UNIX AND EXISTS "/usr/lib64")
   list(APPEND BOOST_LIBRARYDIR "/usr/lib64") #fedora 64-bit fix
