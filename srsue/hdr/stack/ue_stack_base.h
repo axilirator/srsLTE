@@ -68,6 +68,7 @@ typedef struct {
   usim_args_t      usim;
   rrc_args_t       rrc;
   std::string      ue_category_str;
+  nas_ext_args_t   nas_ext;
   nas_args_t       nas;
   gw_args_t        gw;
   bool             have_tti_time_stats;

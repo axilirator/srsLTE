@@ -109,9 +109,14 @@ int ue_stack_lte::init(const stack_args_t& args_, srslte::logger* logger_)
   extif_log->set_hex_limit(args.log.extif_hex_limit);
 
   // Should we use the built-in NAS implementation
-  // TODO: or provide an external interface (RRCTL)?
-  std::unique_ptr<srsue::nas> nas_impl(new srsue::nas(this, args.nas));
-  nas = std::move(nas_impl);
+  // or provide an external interface (RRCTL)?
+  if (args.nas_ext.enable) {
+    std::unique_ptr<srsue::nas_ext> nas_impl(new srsue::nas_ext(this, args.nas_ext));
+    nas = std::move(nas_impl);
+  } else {
+    std::unique_ptr<srsue::nas> nas_impl(new srsue::nas(this, args.nas));
+    nas = std::move(nas_impl);
+  }
 
   // Set up pcap
   if (args.pcap.enable) {
