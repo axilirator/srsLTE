@@ -87,6 +87,34 @@ struct plmn_id_t {
     uint8_t* plmn_ptr  = (uint8_t*)&s1ap_plmn;
     memcpy(&plmn_bytes[0], plmn_ptr + 1, 3);
   }
+  void to_rrctl_bytes(uint8_t *mcc_buf, uint8_t *mnc_buf) const
+  {
+    mcc_buf[0] = ((mcc[1] & 0x0f) << 4) | (mcc[0] & 0x0f);
+    mcc_buf[1] = (0x0f << 4) | (mcc[2] & 0x0f);
+
+    mnc_buf[0] = ((mnc[1] & 0x0f) << 4) | (mnc[0] & 0x0f);
+    if (nof_mnc_digits > 2)
+      mnc_buf[1] = (0x0f << 4) | (mnc[2] & 0x0f);
+    else
+      mnc_buf[1] = 0xff;
+  }
+  void from_rrctl_bytes(const uint8_t *mcc_buf, const uint8_t *mnc_buf)
+  {
+    mcc[0] = mcc_buf[0] & 0x0f;
+    mcc[1] = mcc_buf[0] >> 4;
+    mcc[2] = mcc_buf[1] & 0x0f;
+
+    mnc[0] = mnc_buf[0] & 0x0f;
+    mnc[1] = mnc_buf[0] >> 4;
+
+    if (mnc_buf[1] != 0xff) {
+      nof_mnc_digits = 3;
+      mnc[2] = mnc_buf[1] & 0x0f;
+    } else {
+      nof_mnc_digits = 2;
+      mnc[2] = 0x00;
+    }
+  }
   int from_string(const std::string& plmn_str)
   {
     if (plmn_str.size() < 5 or plmn_str.size() > 6) {
