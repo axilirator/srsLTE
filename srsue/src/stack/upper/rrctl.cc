@@ -56,6 +56,9 @@ std::string msg_hdr_desc(proto::msg_type type, proto::msg_disc disc, uint16_t le
   case RRCTL_PAGING:
     desc += "Paging";
     break;
+  case RRCTL_PARAM:
+    desc += "Parameter";
+    break;
   default:
     desc += "<UNKNOWN>";
   }

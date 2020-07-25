@@ -88,6 +88,7 @@ private:
   void handle_rrctl_conn_establish(rrctl::proto::msg_disc disc, const uint8_t* msg, size_t len);
   void handle_rrctl_conn_release(rrctl::proto::msg_disc disc, const uint8_t* msg, size_t len);
   void handle_rrctl_data(rrctl::proto::msg_disc disc, const uint8_t* msg, size_t len);
+  void handle_rrctl_param(rrctl::proto::msg_disc disc, const uint8_t* msg, size_t len);
 
   void rrctl_send_confirm(rrctl::proto::msg_type type);
   void rrctl_send_error(rrctl::proto::msg_type type);
