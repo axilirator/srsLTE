@@ -175,6 +175,7 @@ void nas_ext::handle_rrctl_data(rrctl::proto::msg_disc disc, const uint8_t* msg,
   nas_pdu->append_bytes(msg, len);
 
   rrc->write_sdu(std::move(nas_pdu));
+  rrctl_send_confirm(rrctl::proto::RRCTL_DATA);
 }
 
 void nas_ext::get_metrics(nas_metrics_t* m)
