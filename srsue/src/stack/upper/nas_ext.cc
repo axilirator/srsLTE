@@ -80,6 +80,9 @@ void nas_ext::init(usim_interface_nas* usim_, rrc_interface_nas* rrc_, gw_interf
     case rrctl::proto::RRCTL_DATA:
       handle_rrctl_data(disc, payload, length);
       break;
+    case rrctl::proto::RRCTL_PARAM:
+      handle_rrctl_param(disc, payload, length);
+      break;
     case rrctl::proto::RRCTL_CONN_RELEASE:
     default:
       nas_log->warning("%s is not handled\n", desc.c_str());
@@ -176,6 +179,36 @@ void nas_ext::handle_rrctl_data(rrctl::proto::msg_disc disc, const uint8_t* msg,
 
   rrc->write_sdu(std::move(nas_pdu));
   rrctl_send_confirm(rrctl::proto::RRCTL_DATA);
+}
+
+void nas_ext::handle_rrctl_param(rrctl::proto::msg_disc disc, const uint8_t* msg, size_t len)
+{
+  const struct rrctl::proto::msg_param_req* param;
+  srslte::s_tmsi_t ue_identity;
+
+  param = reinterpret_cast<const struct rrctl::proto::msg_param_req*> (msg);
+  nas_log->warning("Rx PARAM.req (type=%02x, len=%u)\n", param->type, param->len);
+
+  if (param->len != (len - 2)) { /* XXX: type + length */
+    nas_log->info("Received malformed PARAM.req (len=%u)\n", param->len);
+    rrctl_send_error(rrctl::proto::RRCTL_PARAM);
+    return;
+  }
+
+  switch (param->type) {
+  case rrctl::proto::RRCTL_PARAM_UEID:
+    ue_identity.m_tmsi = ntohl(param->u.ueid.m_tmsi);
+    ue_identity.mmec = param->u.ueid.mmec;
+
+    nas_log->info("Setting UEID: mmec=%x m_tmsi=%x\n",
+                  ue_identity.mmec, ue_identity.m_tmsi);
+    rrc->set_ue_identity(ue_identity);
+    rrctl_send_confirm(rrctl::proto::RRCTL_PARAM);
+    break;
+  default:
+    nas_log->warning("Unhandled PARAM.req type (0x%02x)\n", param->type);
+    rrctl_send_error(rrctl::proto::RRCTL_PARAM);
+  }
 }
 
 void nas_ext::get_metrics(nas_metrics_t* m)

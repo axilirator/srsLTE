@@ -39,6 +39,7 @@ namespace proto {
     RRCTL_CONN_ESTABLISH,
     RRCTL_CONN_RELEASE,
     RRCTL_PAGING,
+    RRCTL_PARAM,
   };
 
   enum msg_disc {
@@ -94,10 +95,23 @@ namespace proto {
     struct __mmec_m_tmsi ueid;
   } __attribute__((packed));
 
+  enum msg_param_type {
+    RRCTL_PARAM_UEID = 0x00,
+  };
+
+  struct msg_param_req {
+    uint8_t type;
+    uint8_t len;
+    union {
+      struct __mmec_m_tmsi ueid;
+    } u;
+  } __attribute__((packed));
+
   struct msg {
     struct msg_hdr hdr;
     union {
       struct msg_data data;
+      struct msg_param_req param_req;
       struct msg_paging_ind paging_ind;
       struct msg_plmn_search_res plmn_search_res;
       struct msg_plmn_select_req plmn_select_req;
