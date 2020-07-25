@@ -225,8 +225,14 @@ void nas_ext::left_rrc_connected() {}
 
 bool nas_ext::paging(srslte::s_tmsi_t* ue_identity)
 {
+  srslte::byte_buffer_t msg;
+
   nas_log->info("Received paging from RRC\n");
-  // TODO: send PAGING.ind to the external entity
+
+  rrctl::codec::enc_paging_ind(msg, ue_identity);
+  iface->write(msg);
+
+  // TODO: what are we supposed to return?
   return false;
 }
 

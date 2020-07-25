@@ -53,6 +53,9 @@ std::string msg_hdr_desc(proto::msg_type type, proto::msg_disc disc, uint16_t le
   case RRCTL_DATA:
     desc += "Data (PDU)";
     break;
+  case RRCTL_PAGING:
+    desc += "Paging";
+    break;
   default:
     desc += "<UNKNOWN>";
   }
@@ -193,6 +196,18 @@ void enc_data_ind(srslte::byte_buffer_t& buf,
   enc_hdr(buf, proto::RRCTL_DATA, proto::RRCTL_IND, sizeof(msg) + pdu_len);
   buf.append_bytes((const uint8_t*) &msg, sizeof(msg));
   buf.append_bytes(pdu, pdu_len);
+}
+
+void enc_paging_ind(srslte::byte_buffer_t& buf,
+                    srslte::s_tmsi_t* ue_identity)
+{
+  struct proto::msg_paging_ind msg;
+
+  msg.ueid.m_tmsi = htonl(ue_identity->m_tmsi);
+  msg.ueid.mmec = ue_identity->mmec;
+
+  enc_hdr(buf, proto::RRCTL_PAGING, proto::RRCTL_IND, sizeof(msg));
+  buf.append_bytes((const uint8_t*) &msg, sizeof(msg));
 }
 
 } // namespace codec

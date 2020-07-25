@@ -38,6 +38,7 @@ namespace proto {
     RRCTL_PLMN_SELECT,
     RRCTL_CONN_ESTABLISH,
     RRCTL_CONN_RELEASE,
+    RRCTL_PAGING,
   };
 
   enum msg_disc {
@@ -84,10 +85,20 @@ namespace proto {
     uint8_t pdu[0];
   } __attribute__((packed));
 
+  struct __mmec_m_tmsi {
+    uint8_t mmec;
+    uint32_t m_tmsi;
+  } __attribute__((packed));
+
+  struct msg_paging_ind {
+    struct __mmec_m_tmsi ueid;
+  } __attribute__((packed));
+
   struct msg {
     struct msg_hdr hdr;
     union {
       struct msg_data data;
+      struct msg_paging_ind paging_ind;
       struct msg_plmn_search_res plmn_search_res;
       struct msg_plmn_select_req plmn_select_req;
       struct msg_conn_establish_req conn_establish_req;
@@ -128,6 +139,9 @@ void dec_conn_establish_req(srslte::establishment_cause_t& cause,
 void enc_data_ind(srslte::byte_buffer_t& buf,
                   const uint8_t *pdu, size_t pdu_len,
                   uint32_t lcid);
+
+void enc_paging_ind(srslte::byte_buffer_t& buf,
+                    srslte::s_tmsi_t* ue_identity);
 
 } // namespace codec
 
