@@ -70,7 +70,7 @@ void suppress_handler(const char* x)
   // do nothing
 }
 
-cf_t zero_mem[64 * 1024];
+static cf_t zero_mem[64 * 1024];
 
 static void log_overflow(rf_uhd_handler_t* h)
 {

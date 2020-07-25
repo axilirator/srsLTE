@@ -34,7 +34,7 @@ typedef union {
   __m64          v[1];
 } decision_t;
 
-union branchtab27 {
+static union branchtab27 {
 
   // unsigned char c[32];
   //__m128i       v[2];
@@ -43,7 +43,7 @@ union branchtab27 {
 
 } Branchtab37_sse2[3];
 
-int firstGo;
+static int firstGo;
 /* State info for instance of Viterbi decoder */
 struct v37 {
   metric_t    metrics1;                  /* path metric buffer 1 */
