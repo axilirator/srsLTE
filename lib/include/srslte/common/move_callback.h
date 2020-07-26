@@ -22,6 +22,7 @@
 #ifndef SRSLTE_MOVE_CALLBACK_H
 #define SRSLTE_MOVE_CALLBACK_H
 
+#include <cstdio>
 #include <cstddef>
 #include <functional>
 #include <type_traits>
