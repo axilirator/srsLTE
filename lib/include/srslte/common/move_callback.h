@@ -25,6 +25,7 @@
 #include <cstdio>
 #include <cstddef>
 #include <cstdint>
+#include <cstdlib>
 
 #include <functional>
 #include <type_traits>
