@@ -37,14 +37,42 @@ using srslte::byte_buffer_t;
 
 namespace srsue {
 
-class nas : public nas_interface_rrc, public nas_interface_ue, public srslte::timer_callback
+class nas_base : public nas_interface_rrc, public nas_interface_ue, public srslte::timer_callback
 {
 public:
-  explicit nas(srslte::task_handler_interface* task_handler_);
-  virtual ~nas() = default;
-  void init(usim_interface_nas* usim_, rrc_interface_nas* rrc_, gw_interface_nas* gw_, const nas_args_t& args_);
-  void stop();
+  explicit nas_base(srslte::task_handler_interface* task_handler_, const char *log_name_);
+  virtual ~nas_base() = default;
+
+  virtual void init(usim_interface_nas* usim_, rrc_interface_nas* rrc_, gw_interface_nas* gw_) = 0;
+  virtual void get_metrics(nas_metrics_t* m) = 0;
+  virtual void stop() = 0;
+
+  void start_pcap(srslte::nas_pcap* pcap_);
   void run_tti();
+
+protected:
+  srslte::byte_buffer_pool* pool    = nullptr;
+  rrc_interface_nas*        rrc     = nullptr;
+  usim_interface_nas*       usim    = nullptr;
+  gw_interface_nas*         gw      = nullptr;
+
+  // Task handler
+  srslte::task_handler_interface* task_handler = nullptr;
+  srslte::proc_manager_list_t     callbacks;
+
+  // Logging reference
+  srslte::log_ref nas_log;
+
+  // PCAP
+  srslte::nas_pcap* pcap = nullptr;
+};
+
+class nas : public nas_base
+{
+public:
+  nas(srslte::task_handler_interface* task_handler_, const nas_args_t& cfg_);
+  void init(usim_interface_nas* usim_, rrc_interface_nas* rrc_, gw_interface_nas* gw_);
+  void stop();
 
   void        get_metrics(nas_metrics_t* m);
   emm_state_t get_state();
@@ -71,17 +99,8 @@ public:
   // timer callback
   void timer_expired(uint32_t timeout_id) override;
 
-  // PCAP
-  void start_pcap(srslte::nas_pcap* pcap_);
-
 private:
-  srslte::byte_buffer_pool* pool = nullptr;
-  srslte::log_ref           nas_log;
-  rrc_interface_nas*        rrc  = nullptr;
-  usim_interface_nas*       usim = nullptr;
-  gw_interface_nas*         gw   = nullptr;
-
-  nas_args_t cfg = {};
+  nas_args_t cfg = { };
 
   emm_state_t state = EMM_STATE_DEREGISTERED;
 
@@ -134,7 +153,6 @@ private:
   uint8_t transaction_id = 0;
 
   // timers
-  srslte::task_handler_interface*     task_handler = nullptr;
   srslte::timer_handler::unique_timer t3402;          // started when attach attempt counter reached 5
   srslte::timer_handler::unique_timer t3410;          // started when attach request is sent, on expiry, start t3411
   srslte::timer_handler::unique_timer t3411;          // started when attach failed
@@ -330,7 +348,6 @@ private:
     nas* nas_ptr;
     enum class state_t { plmn_search, rrc_connect } state = state_t::plmn_search;
   };
-  srslte::proc_manager_list_t      callbacks;
   srslte::proc_t<plmn_search_proc> plmn_searcher;
   srslte::proc_t<rrc_connect_proc> rrc_connector;
 

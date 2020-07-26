@@ -182,8 +182,10 @@ private:
   srslte::rlc                rlc;
   srslte::pdcp               pdcp;
   srsue::rrc                 rrc;
-  srsue::nas                 nas;
   std::unique_ptr<usim_base> usim;
+
+  // NAS implementation (built-in or external)
+  std::unique_ptr<srsue::nas_base> nas;
 };
 
 } // namespace srsue

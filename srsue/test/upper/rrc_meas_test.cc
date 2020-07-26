@@ -108,7 +108,7 @@ private:
 class nas_test : public srsue::nas
 {
 public:
-  nas_test(srslte::task_handler_interface* t) : srsue::nas(t) {}
+  nas_test(srslte::task_handler_interface* t) : srsue::nas(t, {}) {}
   bool is_attached() override { return false; }
 };
 

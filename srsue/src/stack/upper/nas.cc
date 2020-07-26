@@ -234,21 +234,27 @@ proc_outcome_t nas::rrc_connect_proc::react(nas::rrc_connect_proc::connection_re
  *   NAS
  ********************************************************************/
 
-nas::nas(srslte::task_handler_interface* task_handler_) :
+nas_base::nas_base(srslte::task_handler_interface* task_handler_, const char *log_name_) :
   pool(byte_buffer_pool::get_instance()),
+  task_handler(task_handler_),
+  nas_log{log_name_}
+{
+}
+
+nas::nas(srslte::task_handler_interface* task_handler_, const nas_args_t& cfg_) :
+  nas_base::nas_base(task_handler_, "NAS"),
   plmn_searcher(this),
   rrc_connector(this),
-  task_handler(task_handler_),
   t3402(task_handler_->get_unique_timer()),
   t3410(task_handler_->get_unique_timer()),
   t3411(task_handler_->get_unique_timer()),
   t3421(task_handler_->get_unique_timer()),
   reattach_timer(task_handler_->get_unique_timer()),
-  nas_log{"NAS"}
+  cfg(cfg_)
 {
 }
 
-void nas::init(usim_interface_nas* usim_, rrc_interface_nas* rrc_, gw_interface_nas* gw_, const nas_args_t& cfg_)
+void nas::init(usim_interface_nas* usim_, rrc_interface_nas* rrc_, gw_interface_nas* gw_)
 {
   usim = usim_;
   rrc  = rrc_;
@@ -261,7 +267,7 @@ void nas::init(usim_interface_nas* usim_, rrc_interface_nas* rrc_, gw_interface_
   }
 
   // parse and sanity check EIA list
-  std::vector<uint8_t> cap_list = split_string(cfg_.eia);
+  std::vector<uint8_t> cap_list = split_string(cfg.eia);
   if (cap_list.empty()) {
     nas_log->error("Empty EIA list. Select at least one EIA algorithm.\n");
   }
@@ -274,7 +280,7 @@ void nas::init(usim_interface_nas* usim_, rrc_interface_nas* rrc_, gw_interface_
   }
 
   // parse and sanity check EEA list
-  cap_list = split_string(cfg_.eea);
+  cap_list = split_string(cfg.eea);
   if (cap_list.empty()) {
     nas_log->error("Empty EEA list. Select at least one EEA algorithm.\n");
   }
@@ -285,8 +291,6 @@ void nas::init(usim_interface_nas* usim_, rrc_interface_nas* rrc_, gw_interface_
       nas_log->error("EEA%d is not a valid EEA algorithm.\n", *it);
     }
   }
-
-  cfg = cfg_;
 
   if ((read_ctxt_file(&ctxt))) {
     usim->generate_nas_keys(ctxt.k_asme, k_nas_enc, k_nas_int, ctxt.cipher_algo, ctxt.integ_algo);
@@ -325,7 +329,7 @@ emm_state_t nas::get_state()
   return state;
 }
 
-void nas::run_tti()
+void nas_base::run_tti()
 {
   callbacks.run();
 }
@@ -755,7 +759,7 @@ bool nas::get_ipv6_addr(uint8_t* ipv6_addr)
   PCAP
 *******************************************************************************/
 
-void nas::start_pcap(srslte::nas_pcap* pcap_)
+void nas_base::start_pcap(srslte::nas_pcap* pcap_)
 {
   pcap = pcap_;
 }
